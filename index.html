@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="es-UY">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hacete socio | Young Universitario</title>
+    <meta
+      name="description"
+      content="Sumate como socio de Young Universitario. Elegí plan, pagá fácil y completá tus datos para recibir tu carnet."
+    />
+    <meta name="theme-color" content="#B31319" />
+    <link rel="icon" type="image/png" sizes="512x512" href="favicon.png" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Sora', 'ui-sans-serif', 'system-ui'],
+            },
+            colors: {
+              clubRed: '#B31319',
+              clubRedDark: '#8F0F14',
+              clubBlack: '#111111',
+              clubLight: '#F6F7F9',
+            },
+            boxShadow: {
+              card: '0 14px 36px rgba(17, 17, 17, 0.12)',
+              glow: '0 0 0 4px rgba(179, 19, 25, 0.16)',
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      .hero-img::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.56) 0%, rgba(0, 0, 0, 0.38) 60%, rgba(0, 0, 0, 0.7) 100%);
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 260ms ease, transform 260ms ease;
+      }
+
+      .reveal.in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .faq-panel {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 260ms ease;
+      }
+
+      .faq-item.open .faq-panel {
+        max-height: 280px;
+      }
+
+      .faq-item.open .faq-icon {
+        transform: rotate(45deg);
+      }
+
+      .faq-icon {
+        transition: transform 220ms ease;
+      }
+
+      .field {
+        width: 100%;
+        border-radius: 0.75rem;
+        border: 1px solid #d4d4d8;
+        background: #fff;
+        padding: 0.75rem 0.875rem;
+        font-size: 0.95rem;
+        color: #111111;
+        outline: none;
+        transition: border-color 220ms ease, box-shadow 220ms ease;
+      }
+
+      .field:focus-visible {
+        border-color: #b31319;
+        box-shadow: 0 0 0 4px rgba(179, 19, 25, 0.14);
+      }
+
+      .form-msg {
+        min-height: 1.5rem;
+      }
+
+      .benefits-carousel {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .benefit-panel {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transform: scale(1.01);
+        pointer-events: none;
+        transition: opacity 280ms ease, transform 280ms ease;
+      }
+
+      .benefit-panel.active {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+
+      .benefit-dots {
+        position: absolute;
+        left: 50%;
+        bottom: 0.75rem;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 0.45rem;
+      }
+
+      .benefit-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2.1rem;
+        height: 2.1rem;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(17, 17, 17, 0.52);
+        color: #ffffff;
+        font-weight: 700;
+      }
+
+      .benefit-nav.prev {
+        left: 0.6rem;
+      }
+
+      .benefit-nav.next {
+        right: 0.6rem;
+      }
+
+      .benefit-dot {
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 999px;
+        border: 0;
+        background: rgba(255, 255, 255, 0.58);
+      }
+
+      .benefit-dot.active {
+        background: #ffffff;
+      }
+
+      .floating-wa {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 60;
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #22c55e;
+        color: #ffffff;
+        box-shadow: 0 14px 25px rgba(0, 0, 0, 0.22);
+      }
+
+      .floating-wa:hover {
+        background: #16a34a;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        .reveal,
+        .faq-panel,
+        .faq-icon,
+        .plan-card,
+        .cta-btn,
+        .field,
+        .benefit-panel,
+        .benefit-dot {
+          transition: none !important;
+          animation: none !important;
+        }
+
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="bg-clubLight text-clubBlack antialiased">
+    <header class="hero-img relative isolate overflow-hidden">
+      <img
+        src="hero-young.jpg"
+        alt="Bandera de Young Universitario"
+        class="absolute inset-0 h-full w-full object-cover"
+        loading="eager"
+      />
+      <div class="relative z-10 mx-auto max-w-6xl px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20">
+        <div class="reveal max-w-3xl">
+          <span
+            id="heroBadge"
+            class="mb-4 inline-flex items-center rounded-full border border-white/35 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white"
+            >Campaña de socios • Young, Uruguay</span
+          >
+          <h1 id="heroTitle" class="text-4xl font-extrabold leading-[0.95] text-white sm:text-5xl lg:text-6xl">
+            Hacete socio de Young Universitario
+          </h1>
+
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <a
+              href="#tipoSocio"
+              class="cta-btn inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-clubBlack shadow-card outline-none ring-clubRed/50 transition duration-200 hover:-translate-y-0.5 hover:shadow-glow focus-visible:ring-4"
+              >Hacerme socio</a
+            >
+            <a
+              id="instagramHero"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              class="cta-btn inline-flex items-center justify-center gap-2 rounded-xl border border-white/50 bg-white/10 px-5 py-3 text-sm font-bold text-white outline-none ring-white/50 transition duration-200 hover:-translate-y-0.5 hover:bg-white/20 focus-visible:ring-4"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="h-4 w-4 fill-current">
+                <path
+                  d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2Zm0 1.8A3.95 3.95 0 0 0 3.8 7.75v8.5a3.95 3.95 0 0 0 3.95 3.95h8.5a3.95 3.95 0 0 0 3.95-3.95v-8.5a3.95 3.95 0 0 0-3.95-3.95h-8.5Zm9.3 1.2a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Z"
+                />
+              </svg>
+              Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+      <section class="reveal">
+        <h2 class="text-2xl font-bold sm:text-3xl">¿Qué es ser socio?</h2>
+        <p class="mt-2 max-w-3xl text-sm text-zinc-700 sm:text-base">
+          Es bancar al club de tu ciudad todo el año. Tu aporte ayuda a sostener fútbol, formativas y actividades para la comunidad.
+        </p>
+      </section>
+
+      <section class="reveal mt-10">
+        <h2 class="text-2xl font-bold sm:text-3xl">Cómo funciona</h2>
+        <ol class="mt-5 grid gap-3 md:grid-cols-5">
+          <li class="rounded-xl border border-zinc-200 bg-white p-4 text-sm font-semibold shadow-sm">1. Elegí tipo de socio</li>
+          <li class="rounded-xl border border-zinc-200 bg-white p-4 text-sm font-semibold shadow-sm">2. Elegí plan</li>
+          <li class="rounded-xl border border-zinc-200 bg-white p-4 text-sm font-semibold shadow-sm">3. Pagá</li>
+          <li class="rounded-xl border border-zinc-200 bg-white p-4 text-sm font-semibold shadow-sm">4. Completá tus datos</li>
+          <li class="rounded-xl border border-zinc-200 bg-white p-4 text-sm font-semibold shadow-sm">5. Recibís carnet</li>
+        </ol>
+      </section>
+
+      <section id="tipoSocio" class="reveal mt-10 rounded-2xl border border-zinc-200 bg-white p-5 shadow-card">
+        <h2 class="text-2xl font-bold sm:text-3xl">¿Sos socio nuevo o renovación?</h2>
+        <p class="mt-2 text-sm text-zinc-700">Elegí esta opción antes de pagar y completar datos.</p>
+
+        <div class="mt-4 grid gap-2 sm:grid-cols-2">
+          <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 p-3 text-sm font-semibold text-zinc-800">
+            <input type="radio" name="memberType" value="nuevo" checked class="h-4 w-4 border-zinc-300 text-clubRed focus:ring-clubRed" />
+            Socio nuevo
+          </label>
+          <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 p-3 text-sm font-semibold text-zinc-800">
+            <input type="radio" name="memberType" value="renovacion" class="h-4 w-4 border-zinc-300 text-clubRed focus:ring-clubRed" />
+            Renovación
+          </label>
+        </div>
+      </section>
+
+      <section id="planes" class="reveal mt-10">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-2xl font-bold sm:text-3xl">Elegí tu plan</h2>
+          <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-clubRed">Paso 1: Pago</span>
+        </div>
+
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+          <article
+            class="plan-card rounded-2xl border border-zinc-200 bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:border-clubRed/45 hover:shadow-glow"
+          >
+            <p class="text-sm font-semibold text-zinc-600">Semestral</p>
+            <p id="priceMonthly" class="mt-1 text-4xl font-extrabold text-clubBlack">$0</p>
+            <ul class="mt-3 space-y-1 text-sm text-zinc-700">
+              <li>• 2 cuotas</li>
+              <li>• Ideal para arrancar hoy</li>
+              <li>• Apoyo directo al club</li>
+            </ul>
+            <div class="mt-4 grid gap-2">
+              <a
+                id="payMonthly"
+                href="#"
+                target="_blank"
+                rel="noopener"
+                class="cta-btn inline-flex items-center justify-center rounded-xl bg-clubRed px-4 py-3 text-sm font-bold text-white outline-none ring-clubRed/50 transition duration-200 hover:bg-clubRedDark hover:shadow-glow focus-visible:ring-4"
+                >Pagar semestral</a
+              >
+              <a
+                href="#datos"
+                class="cta-btn inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm font-bold text-clubBlack outline-none ring-clubRed/40 transition duration-200 hover:border-clubRed hover:text-clubRed focus-visible:ring-4"
+                >Completar datos</a
+              >
+            </div>
+          </article>
+
+          <article
+            class="plan-card rounded-2xl border-2 border-clubRed bg-white p-5 shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-glow"
+          >
+            <p class="text-sm font-semibold text-zinc-600">Anual</p>
+            <p id="priceYearly" class="mt-1 text-4xl font-extrabold text-clubBlack">$0</p>
+            <ul class="mt-3 space-y-1 text-sm text-zinc-700">
+              <li>• 1 cuota anual</li>
+              <li>• Mejor costo por período</li>
+              <li>• Te olvidás de renovar seguido</li>
+            </ul>
+            <div class="mt-4 grid gap-2">
+              <a
+                id="payYearly"
+                href="#"
+                target="_blank"
+                rel="noopener"
+                class="cta-btn inline-flex items-center justify-center rounded-xl bg-clubRed px-4 py-3 text-sm font-bold text-white outline-none ring-clubRed/50 transition duration-200 hover:bg-clubRedDark hover:shadow-glow focus-visible:ring-4"
+                >Pagar anual</a
+              >
+              <a
+                href="#datos"
+                class="cta-btn inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm font-bold text-clubBlack outline-none ring-clubRed/40 transition duration-200 hover:border-clubRed hover:text-clubRed focus-visible:ring-4"
+                >Completar datos</a
+              >
+            </div>
+          </article>
+        </div>
+
+        <p class="mt-4 rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm font-semibold text-sky-800">
+          No olvides completar el formulario luego de realizar tu pago.
+        </p>
+      </section>
+
+      <section id="datos" class="reveal mt-10">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-2xl font-bold sm:text-3xl">Completá tus datos</h2>
+          <span class="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-clubRed">Paso 2: Registro</span>
+        </div>
+
+        <p class="mt-2 max-w-3xl text-sm text-zinc-700">
+          Si ya pagaste, completá este formulario y te contactamos para enviarte tu carnet.
+        </p>
+
+        <form id="socioForm" class="mt-5 rounded-2xl border border-zinc-200 bg-white p-5 shadow-card" novalidate>
+          <input type="hidden" name="member_type" id="memberTypeHidden" value="nuevo" />
+
+          <div id="newMemberFields" class="grid gap-3 sm:grid-cols-2">
+            <label class="text-sm font-semibold text-zinc-800">
+              Nombre y apellido *
+              <input class="field mt-1" type="text" name="nombre" autocomplete="name" required data-required-new="true" />
+            </label>
+
+            <label class="text-sm font-semibold text-zinc-800">
+              Cédula de identidad *
+              <input class="field mt-1" type="text" name="ci_new" inputmode="numeric" required data-required-new="true" />
+            </label>
+
+            <label class="text-sm font-semibold text-zinc-800">
+              Teléfono / WhatsApp *
+              <input class="field mt-1" type="tel" name="telefono_whatsapp" autocomplete="tel" required data-required-new="true" />
+            </label>
+
+            <label class="text-sm font-semibold text-zinc-800">
+              Email (opcional)
+              <input class="field mt-1" type="email" name="email" autocomplete="email" />
+            </label>
+          </div>
+
+          <div id="renewMemberFields" class="mt-1 hidden grid gap-3">
+            <label class="text-sm font-semibold text-zinc-800">
+              Cédula de identidad * (sin puntos ni guiones)
+              <input class="field mt-1" type="text" name="ci_renew" inputmode="numeric" pattern="[0-9]+" data-required-renew="true" />
+            </label>
+          </div>
+
+          <div class="mt-3 grid gap-3 sm:grid-cols-2">
+            <label class="text-sm font-semibold text-zinc-800 sm:col-span-2">
+              Plan *
+              <select class="field mt-1" name="plan" required>
+                <option value="">Seleccioná un plan</option>
+                <option value="semestral">Semestral</option>
+                <option value="anual">Anual</option>
+              </select>
+            </label>
+
+            <label class="text-sm font-semibold text-zinc-800 sm:col-span-2">
+              Referencia/ID de pago (si la tenés)
+              <input class="field mt-1" type="text" name="payment_ref" />
+            </label>
+          </div>
+
+          <div id="carnetSection" class="mt-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+            <p class="text-sm font-semibold text-zinc-800">¿Querés recibir carnet de socio?</p>
+            <div class="mt-2 grid gap-2 sm:grid-cols-2">
+              <label class="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800">
+                <input
+                  type="radio"
+                  name="wants_carnet"
+                  value="si"
+                  class="h-4 w-4 border-zinc-300 text-clubRed focus:ring-clubRed"
+                />
+                Sí
+              </label>
+              <label class="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-800">
+                <input
+                  type="radio"
+                  name="wants_carnet"
+                  value="no"
+                  checked
+                  class="h-4 w-4 border-zinc-300 text-clubRed focus:ring-clubRed"
+                />
+                No
+              </label>
+            </div>
+
+            <div id="carnetFields" class="mt-3 hidden grid gap-3 sm:grid-cols-2">
+              <label class="text-sm font-semibold text-zinc-800">
+                Fecha de nacimiento *
+                <input class="field mt-1" type="date" name="birth_date" data-required-carnet="true" />
+              </label>
+
+              <label class="text-sm font-semibold text-zinc-800">
+                Categoría *
+                <select class="field mt-1" name="category" data-required-carnet="true">
+                  <option value="">Seleccioná categoría</option>
+                  <option value="hincha">Hincha</option>
+                  <option value="jugador">Jugador</option>
+                  <option value="ex-jugador">Ex-jugador</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <input type="text" name="company" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+
+          <label class="mt-4 flex items-start gap-2 text-sm font-medium text-zinc-700">
+            <input
+              class="mt-0.5 h-4 w-4 rounded border-zinc-300 text-clubRed focus:ring-clubRed"
+              type="checkbox"
+              name="terms"
+              required
+            />
+            Confirmo que los datos son correctos y autorizo el contacto del club.
+          </label>
+
+          <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button
+              id="submitButton"
+              type="submit"
+              class="cta-btn inline-flex items-center justify-center rounded-xl bg-clubRed px-5 py-3 text-sm font-bold text-white outline-none ring-clubRed/50 transition duration-200 hover:bg-clubRedDark hover:shadow-glow focus-visible:ring-4 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Enviar datos
+            </button>
+            <p id="formStatus" class="form-msg text-sm font-semibold text-zinc-700" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+
+        <p class="mt-3 text-sm text-zinc-600">
+          Si querés abonar la suscripción mediante otro método de pago, comunicate por WhatsApp y te asistiremos.
+        </p>
+      </section>
+
+      <section class="reveal mt-10">
+        <h2 class="text-2xl font-bold sm:text-3xl">Beneficios de ser socio</h2>
+
+        <div id="benefitsCarousel" class="benefits-carousel mt-4 h-[20rem] rounded-2xl border border-zinc-200 bg-white shadow-card sm:h-[24rem]">
+          <article class="benefit-panel active">
+            <img src="aa09fbd4-3954-49e3-add9-6e8aaf43f6b5.JPG" alt="Sorteos mensuales" class="h-full w-full rounded-2xl object-cover" loading="lazy" />
+            <div class="absolute inset-x-0 bottom-0 rounded-b-2xl bg-gradient-to-t from-black/80 to-transparent p-5 text-white">
+              <p class="mt-1 text-base font-semibold">Sorteos mensuales para socios</p>
+            </div>
+          </article>
+
+          <article class="benefit-panel">
+            <img src="f4faa4ef-f7c6-47c1-99a5-a4287300b37a.JPG" alt="Descuento en merchandising" class="h-full w-full rounded-2xl object-cover" loading="lazy" />
+            <div class="absolute inset-x-0 bottom-0 rounded-b-2xl bg-gradient-to-t from-black/80 to-transparent p-5 text-white">
+              <p class="mt-1 text-base font-semibold">Descuento en merchandising del club</p>
+            </div>
+          </article>
+
+          <article class="benefit-panel">
+            <img src="e0b545ca-be7e-45e3-8abd-6cc7acf92794.JPG" alt="Descuentos en comercios locales" class="h-full w-full rounded-2xl object-cover" loading="lazy" />
+            <div class="absolute inset-x-0 bottom-0 rounded-b-2xl bg-gradient-to-t from-black/80 to-transparent p-5 text-white">
+              <p class="mt-1 text-base font-semibold">Descuentos en comercios locales</p>
+            </div>
+          </article>
+
+          <button id="benefitPrev" class="benefit-nav prev" type="button" aria-label="Beneficio anterior">‹</button>
+          <button id="benefitNext" class="benefit-nav next" type="button" aria-label="Beneficio siguiente">›</button>
+
+          <div class="benefit-dots">
+            <button class="benefit-dot active" type="button" aria-label="Ver beneficio 1"></button>
+            <button class="benefit-dot" type="button" aria-label="Ver beneficio 2"></button>
+            <button class="benefit-dot" type="button" aria-label="Ver beneficio 3"></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="reveal mt-10">
+        <h2 class="text-2xl font-bold sm:text-3xl">Preguntas frecuentes</h2>
+
+        <div class="mt-4 space-y-2">
+          <article class="faq-item rounded-xl border border-zinc-200 bg-white" data-faq>
+            <button
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm font-bold text-clubBlack outline-none ring-clubRed/40 focus-visible:ring-4"
+              type="button"
+              aria-expanded="false"
+              aria-controls="faq-1"
+            >
+              ¿Cómo recibo el carnet?
+              <span class="faq-icon text-lg leading-none text-clubRed">+</span>
+            </button>
+            <div id="faq-1" class="faq-panel px-4" role="region">
+              <p class="pb-3 text-sm text-zinc-700">Luego del pago y del envío de datos, el club te contacta para coordinar entrega.</p>
+            </div>
+          </article>
+
+          <article class="faq-item rounded-xl border border-zinc-200 bg-white" data-faq>
+            <button
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm font-bold text-clubBlack outline-none ring-clubRed/40 focus-visible:ring-4"
+              type="button"
+              aria-expanded="false"
+              aria-controls="faq-2"
+            >
+              ¿Puedo pagar en el evento?
+              <span class="faq-icon text-lg leading-none text-clubRed">+</span>
+            </button>
+            <div id="faq-2" class="faq-panel px-4" role="region">
+              <p class="pb-3 text-sm text-zinc-700">Sí. Te ayudamos ahí mismo para completar el pago desde tu celular.</p>
+            </div>
+          </article>
+
+          <article class="faq-item rounded-xl border border-zinc-200 bg-white" data-faq>
+            <button
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm font-bold text-clubBlack outline-none ring-clubRed/40 focus-visible:ring-4"
+              type="button"
+              aria-expanded="false"
+              aria-controls="faq-3"
+            >
+              ¿Qué pasa si no tengo Mercado Pago?
+              <span class="faq-icon text-lg leading-none text-clubRed">+</span>
+            </button>
+            <div id="faq-3" class="faq-panel px-4" role="region">
+              <p class="pb-3 text-sm text-zinc-700">Acercate al equipo del club y te damos alternativa de pago.</p>
+            </div>
+          </article>
+
+          <article class="faq-item rounded-xl border border-zinc-200 bg-white" data-faq>
+            <button
+              class="faq-trigger flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm font-bold text-clubBlack outline-none ring-clubRed/40 focus-visible:ring-4"
+              type="button"
+              aria-expanded="false"
+              aria-controls="faq-4"
+            >
+              ¿Cómo me contacto?
+              <span class="faq-icon text-lg leading-none text-clubRed">+</span>
+            </button>
+            <div id="faq-4" class="faq-panel px-4" role="region">
+              <p id="contactText" class="pb-3 text-sm text-zinc-700">Escribinos por nuestros canales oficiales.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="py-4"></footer>
+
+    <a
+      id="whatsappFloat"
+      href="#"
+      target="_blank"
+      rel="noopener"
+      class="floating-wa outline-none ring-green-300/60 transition duration-200 hover:-translate-y-0.5 focus-visible:ring-4"
+      aria-label="Abrir WhatsApp"
+    >
+      <svg viewBox="0 0 32 32" aria-hidden="true" class="h-7 w-7 fill-current">
+        <path
+          d="M16.04 3C9.42 3 4.04 8.28 4.04 14.8c0 2.08.55 4.12 1.6 5.92L4 29l8.57-1.55a12.1 12.1 0 0 0 3.47.5c6.62 0 12-5.28 12-11.8S22.66 3 16.04 3Zm0 22.8a9.9 9.9 0 0 1-3.34-.57l-.24-.08-5.08.92.96-4.9-.16-.25a9.66 9.66 0 0 1-1.5-5.12c0-5.35 4.41-9.7 9.84-9.7s9.84 4.35 9.84 9.7-4.41 9.7-9.84 9.7Zm5.4-7.42c-.3-.15-1.76-.86-2.03-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.23-.64.08-.3-.15-1.26-.46-2.4-1.47-.88-.78-1.48-1.74-1.66-2.04-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.6-.92-2.2-.24-.57-.49-.5-.67-.51h-.57c-.2 0-.53.08-.8.38-.27.3-1.05 1.02-1.05 2.5s1.08 2.9 1.23 3.1c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.72.64.72.23 1.37.2 1.88.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.08-.13-.28-.2-.58-.35Z"
+        />
+      </svg>
+    </a>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
