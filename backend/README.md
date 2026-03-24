@@ -9,6 +9,7 @@ NestJS backend for membership registration/renewal.
 - Renews subscription (`semestral` = +6 months, `anual` = +12 months) when member exists
 - Creates a new row when member does not exist
 - Sends admin email notification after create/update
+- Sends confirmation email to the member after create/update (if email exists)
 
 ## API
 
@@ -36,10 +37,11 @@ npm run dev
 - One of:
   - `GOOGLE_SERVICE_ACCOUNT_JSON`
   - or `GOOGLE_SERVICE_ACCOUNT_EMAIL` + `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_USER`
-- `SMTP_PASS`
+- `RESEND_API_KEY` (preferred) OR SMTP vars:
+  - `SMTP_HOST`
+  - `SMTP_PORT`
+  - `SMTP_USER`
+  - `SMTP_PASS`
 - `MAIL_FROM`
 - `ADMIN_NOTIFICATION_EMAIL`
 - `CORS_ORIGIN`
@@ -78,4 +80,3 @@ Use AWS App Runner with same Dockerfile and env vars:
 3. Configure env vars.
 4. Health check path: `/api/v1/health`.
 5. Deploy and update frontend `BACKEND_API_URL`.
-

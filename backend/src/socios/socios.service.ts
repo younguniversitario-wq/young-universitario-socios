@@ -51,6 +51,35 @@ export class SociosService {
     };
   }
 
+  private async dispatchNotifications(payload: {
+    operation: 'created' | 'renewed';
+    ci: string;
+    nombre?: string;
+    plan: 'semestral' | 'anual';
+    email?: string;
+    telefono?: string;
+    paymentRef?: string;
+    subscriptionEndsAt: string;
+  }): Promise<void> {
+    try {
+      await this.adminEmailService.notifyAdmin(payload);
+    } catch (error) {
+      this.logger.warn({
+        message: 'Admin email notification failed',
+        data: { ci: payload.ci, operation: payload.operation, error: (error as Error).message },
+      });
+    }
+
+    try {
+      await this.adminEmailService.notifyMember(payload);
+    } catch (error) {
+      this.logger.warn({
+        message: 'Member email notification failed',
+        data: { ci: payload.ci, operation: payload.operation, error: (error as Error).message },
+      });
+    }
+  }
+
   async registerOrRenew(
     input: RegisterOrRenewSocioInputDto,
     formKey: string | undefined,
@@ -102,7 +131,7 @@ export class SociosService {
       };
 
       await this.sociosSheetRepository.update(existing.rowNumber, updated);
-      await this.adminEmailService.notifyAdmin({
+      await this.dispatchNotifications({
         operation: 'renewed',
         ci,
         nombre: updated.nombre || existing.values.nombre,
@@ -156,12 +185,12 @@ export class SociosService {
       updated_at: nowIso,
     };
 
-    await this.sociosSheetRepository.create(created);
-    await this.adminEmailService.notifyAdmin({
-      operation: 'created',
-      ci,
-      nombre: created.nombre,
-      plan: input.plan,
+      await this.sociosSheetRepository.create(created);
+      await this.dispatchNotifications({
+        operation: 'created',
+        ci,
+        nombre: created.nombre,
+        plan: input.plan,
       email: created.email,
       telefono: created.telefono,
       paymentRef: input.payment_ref,

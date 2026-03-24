@@ -34,6 +34,9 @@ services:
       - key: GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
         value: REPLACE_ME
         type: SECRET
+      - key: RESEND_API_KEY
+        value: REPLACE_ME
+        type: SECRET
       - key: SMTP_HOST
         value: REPLACE_ME
         type: SECRET
