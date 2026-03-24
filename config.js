@@ -9,6 +9,7 @@ window.LANDING_CONFIG = {
   CONTACT_WHATSAPP: '+598 99982686',
   CONTACT_EMAIL: 'deleonaparicio@gmail.com',
   WHATSAPP_MESSAGE: 'Hola! Quiero hacerme socio de Young Universitario. Me pueden ayudar?',
+  BACKEND_API_URL: '(Configurar BACKEND_API_URL)',
   N8N_WEBHOOK_URL: 'https://apadeleon.app.n8n.cloud/webhook-test/registro-socio',
   FORM_KEY: 'young-2026-socios-9f3k',
 };

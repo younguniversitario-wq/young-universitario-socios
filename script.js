@@ -326,8 +326,9 @@
       return;
     }
 
-    if (!config.N8N_WEBHOOK_URL || config.N8N_WEBHOOK_URL.indexOf('(Configurar') === 0) {
-      setStatus('Falta configurar N8N_WEBHOOK_URL en config.js.', 'error');
+    var submitEndpoint = config.BACKEND_API_URL || config.N8N_WEBHOOK_URL;
+    if (!submitEndpoint || submitEndpoint.indexOf('(Configurar') === 0) {
+      setStatus('Falta configurar BACKEND_API_URL en config.js.', 'error');
       return;
     }
 
@@ -388,7 +389,7 @@
     setStatus('Enviando...', 'info');
 
     try {
-      var response = await fetch(config.N8N_WEBHOOK_URL, {
+      var response = await fetch(submitEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
