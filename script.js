@@ -357,7 +357,6 @@
       return;
     }
 
-    var nowIso = new Date().toISOString();
     var payload = {
       member_type: memberType,
       ci: ci,
@@ -366,10 +365,7 @@
       pageUrl: window.location.href,
     };
 
-    if (memberType === 'renovacion') {
-      payload.updatedAt = nowIso;
-    } else {
-      payload.createdAt = nowIso;
+    if (memberType !== 'renovacion') {
       payload.nombre = String(formData.get('nombre') || '').trim();
       payload.telefono = String(formData.get('telefono_whatsapp') || '').trim();
       payload.email = String(formData.get('email') || '').trim();

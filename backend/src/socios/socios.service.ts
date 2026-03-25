@@ -51,6 +51,42 @@ export class SociosService {
     };
   }
 
+  private normalizeWhitespace(value: string | undefined): string {
+    return String(value || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private normalizeEmail(value: string | undefined): string {
+    return this.normalizeWhitespace(value).toLowerCase();
+  }
+
+  private normalizePhone(value: string | undefined): string {
+    const normalized = this.normalizeWhitespace(value).replace(/[^\d+]/g, '');
+    if (!normalized) return '';
+    if (normalized.startsWith('+')) return normalized;
+    return normalized.replace(/[^\d]/g, '');
+  }
+
+  private normalizeMemberInput(input: RegisterOrRenewSocioInputDto): RegisterOrRenewSocioInputDto {
+    return {
+      ...input,
+      ci: String(input.ci || '').replace(/\D/g, ''),
+      nombre: this.normalizeWhitespace(input.nombre),
+      telefono: this.normalizePhone(input.telefono),
+      email: this.normalizeEmail(input.email),
+      payment_ref: this.normalizeWhitespace(input.payment_ref),
+      birth_date: this.normalizeWhitespace(input.birth_date),
+      category: this.normalizeWhitespace(input.category),
+      pageUrl: this.normalizeWhitespace(input.pageUrl),
+      utm_source: this.normalizeWhitespace(input.utm_source),
+      utm_medium: this.normalizeWhitespace(input.utm_medium),
+      utm_campaign: this.normalizeWhitespace(input.utm_campaign),
+      utm_content: this.normalizeWhitespace(input.utm_content),
+      utm_term: this.normalizeWhitespace(input.utm_term),
+    };
+  }
+
   private async dispatchNotifications(payload: {
     operation: 'created' | 'renewed';
     ci: string;
@@ -87,7 +123,8 @@ export class SociosService {
     this.assertFormKey(formKey);
     await this.sociosSheetRepository.ensureHeaderRow();
 
-    const ci = input.ci.replace(/\D/g, '');
+    const normalizedInput = this.normalizeMemberInput(input);
+    const ci = normalizedInput.ci;
     const nowIso = new Date().toISOString();
 
     if (!ci) {
@@ -100,7 +137,7 @@ export class SociosService {
 
     const existing = await this.sociosSheetRepository.findByCi(ci);
 
-    if (input.member_type === 'renovacion' && !existing) {
+    if (normalizedInput.member_type === 'renovacion' && !existing) {
       throw new ApiException(
         ERROR_CODES.MEMBER_NOT_FOUND_FOR_RENEWAL,
         'No existe un socio con esa cedula para renovar.',
@@ -109,24 +146,34 @@ export class SociosService {
       );
     }
 
-    const window = this.computeSubscriptionWindow(input.plan, existing?.values.subscription_ends_at);
+    const window = this.computeSubscriptionWindow(
+      normalizedInput.plan,
+      existing?.values.subscription_ends_at,
+    );
 
     if (existing) {
+      const normalizedExistingPhone = this.normalizePhone(existing.values.telefono);
+      const normalizedExistingEmail = this.normalizeEmail(existing.values.email);
       const updated: Record<string, string> = {
         ...existing.values,
-        member_type: input.member_type,
-        plan: input.plan,
-        payment_ref: input.payment_ref || existing.values.payment_ref || '',
+        ci: ci,
+        ci_normalizada: ci,
+        member_type: normalizedInput.member_type,
+        plan: normalizedInput.plan,
+        payment_ref: normalizedInput.payment_ref || existing.values.payment_ref || '',
+        telefono: normalizedInput.telefono || normalizedExistingPhone,
+        email: normalizedInput.email || normalizedExistingEmail,
+        email_normalizado: normalizedInput.email || normalizedExistingEmail,
         subscription_starts_at: window.startsAt,
         subscription_ends_at: window.endsAt,
         status: 'activo',
         last_operation: 'renewed',
-        page_url: input.pageUrl,
-        utm_source: input.utm_source || existing.values.utm_source || '',
-        utm_medium: input.utm_medium || existing.values.utm_medium || '',
-        utm_campaign: input.utm_campaign || existing.values.utm_campaign || '',
-        utm_content: input.utm_content || existing.values.utm_content || '',
-        utm_term: input.utm_term || existing.values.utm_term || '',
+        page_url: normalizedInput.pageUrl,
+        utm_source: normalizedInput.utm_source || existing.values.utm_source || '',
+        utm_medium: normalizedInput.utm_medium || existing.values.utm_medium || '',
+        utm_campaign: normalizedInput.utm_campaign || existing.values.utm_campaign || '',
+        utm_content: normalizedInput.utm_content || existing.values.utm_content || '',
+        utm_term: normalizedInput.utm_term || existing.values.utm_term || '',
         updated_at: nowIso,
       };
 
@@ -135,14 +182,14 @@ export class SociosService {
         operation: 'renewed',
         ci,
         nombre: updated.nombre || existing.values.nombre,
-        plan: input.plan,
+        plan: normalizedInput.plan,
         email: updated.email || existing.values.email,
         telefono: updated.telefono || existing.values.telefono,
-        paymentRef: input.payment_ref,
+        paymentRef: normalizedInput.payment_ref,
         subscriptionEndsAt: window.endsAt,
       });
 
-      this.logger.info({ message: 'Socio renewed', data: { ci, plan: input.plan } });
+      this.logger.info({ message: 'Socio renewed', data: { ci, plan: normalizedInput.plan } });
 
       return new RegisterOrRenewSocioOutputDto({
         operation: 'renewed',
@@ -152,7 +199,7 @@ export class SociosService {
       });
     }
 
-    if (!input.nombre || !input.telefono || !input.email) {
+    if (!normalizedInput.nombre || !normalizedInput.telefono || !normalizedInput.email) {
       throw new ApiException(
         ERROR_CODES.INVALID_PAYLOAD,
         'nombre, telefono y email son obligatorios para socio nuevo.',
@@ -162,25 +209,27 @@ export class SociosService {
 
     const created = {
       ci,
-      nombre: input.nombre,
-      telefono: input.telefono,
-      email: input.email,
-      member_type: input.member_type,
-      plan: input.plan,
-      payment_ref: input.payment_ref || '',
-      wants_carnet: input.wants_carnet || 'no',
-      birth_date: input.birth_date || '',
-      category: input.category || '',
+      ci_normalizada: ci,
+      nombre: normalizedInput.nombre,
+      telefono: normalizedInput.telefono,
+      email: normalizedInput.email,
+      email_normalizado: normalizedInput.email,
+      member_type: normalizedInput.member_type,
+      plan: normalizedInput.plan,
+      payment_ref: normalizedInput.payment_ref || '',
+      wants_carnet: normalizedInput.wants_carnet || 'no',
+      birth_date: normalizedInput.birth_date || '',
+      category: normalizedInput.category || '',
       subscription_starts_at: window.startsAt,
       subscription_ends_at: window.endsAt,
       status: 'activo',
       last_operation: 'created',
-      utm_source: input.utm_source || '',
-      utm_medium: input.utm_medium || '',
-      utm_campaign: input.utm_campaign || '',
-      utm_content: input.utm_content || '',
-      utm_term: input.utm_term || '',
-      page_url: input.pageUrl,
+      utm_source: normalizedInput.utm_source || '',
+      utm_medium: normalizedInput.utm_medium || '',
+      utm_campaign: normalizedInput.utm_campaign || '',
+      utm_content: normalizedInput.utm_content || '',
+      utm_term: normalizedInput.utm_term || '',
+      page_url: normalizedInput.pageUrl,
       created_at: nowIso,
       updated_at: nowIso,
     };
@@ -190,14 +239,14 @@ export class SociosService {
         operation: 'created',
         ci,
         nombre: created.nombre,
-        plan: input.plan,
-      email: created.email,
-      telefono: created.telefono,
-      paymentRef: input.payment_ref,
-      subscriptionEndsAt: window.endsAt,
-    });
+        plan: normalizedInput.plan,
+        email: created.email,
+        telefono: created.telefono,
+        paymentRef: normalizedInput.payment_ref,
+        subscriptionEndsAt: window.endsAt,
+      });
 
-    this.logger.info({ message: 'Socio created', data: { ci, plan: input.plan } });
+    this.logger.info({ message: 'Socio created', data: { ci, plan: normalizedInput.plan } });
 
     return new RegisterOrRenewSocioOutputDto({
       operation: 'created',
